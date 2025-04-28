@@ -26,7 +26,7 @@ public class Sinistro {
 		this.tipo = tipo;
 	}
 	
-	public String numero() {
+	public String getNumero() {
 		return numero;
 	}
 	public void setNumero(String numero) {
