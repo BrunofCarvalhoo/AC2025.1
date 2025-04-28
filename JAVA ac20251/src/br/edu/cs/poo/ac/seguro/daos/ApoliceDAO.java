@@ -26,7 +26,7 @@ public class ApoliceDAO extends DAOGenerico {
 	}
 	
 	public boolean alterar(Apolice segurado) {
-		if(buscar(segurado.getNumero()) != null) {
+		if(buscar(segurado.getNumero()) == null) {
 			return false;
 		}
 		else {
