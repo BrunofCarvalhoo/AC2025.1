@@ -1,30 +1,22 @@
 package br.edu.cs.poo.ac.seguro.entidades;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
 //@AllArgsConstructor
-public class Apolice {
+@RequiredArgsConstructor
+public class Apolice implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private String numero;
-	private Veiculo veiculo;
-	private BigDecimal valorFranquia;
-	private BigDecimal valorPremio;
-	private BigDecimal valorMaximoSegurado;
-	public Apolice(Veiculo veiculo, BigDecimal valorFranquia, BigDecimal valorPremio, BigDecimal valorMaximoSegurado) {
-		super();
-		this.veiculo = veiculo;
-		this.valorFranquia = valorFranquia;
-		this.valorPremio = valorPremio;
-		this.valorMaximoSegurado = valorMaximoSegurado;
-	}
-	
-	public String getNumero() {
-		return numero;
-	}
-	public void setNumero(String numero) {
-		this.numero = numero;
-	}
-	
+    @NonNull private Veiculo veiculo;
+    @NonNull private BigDecimal valorFranquia;
+    @NonNull private BigDecimal valorPremio;
+    @NonNull private BigDecimal valorMaximoSegurado;
+
 }

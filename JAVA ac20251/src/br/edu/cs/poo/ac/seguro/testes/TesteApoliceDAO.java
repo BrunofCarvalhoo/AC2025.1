@@ -1,100 +1,148 @@
 package br.edu.cs.poo.ac.seguro.testes;
 
-import java.math.BigDecimal;
+import br.edu.cs.poo.ac.seguro.daos.ApoliceDAO;
+import br.edu.cs.poo.ac.seguro.entidades.Apolice;
+
+import br.edu.cs.poo.ac.seguro.entidades.SeguradoEmpresa;
+import br.edu.cs.poo.ac.seguro.entidades.Veiculo;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import br.edu.cs.poo.ac.seguro.daos.ApoliceDAO;
-import br.edu.cs.poo.ac.seguro.entidades.Apolice;
-import br.edu.cs.poo.ac.seguro.entidades.CategoriaVeiculo;
-import br.edu.cs.poo.ac.seguro.entidades.Veiculo;
+import java.io.File;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class TesteApoliceDAO extends TesteDAO {
+
     private ApoliceDAO dao = new ApoliceDAO();
 
     @Override
-    protected Class<?> getClasse() {
+    protected Class getClasse() {
         return Apolice.class;
     }
 
-    private Apolice criarApoliceComNumero(String numero) {
-        Veiculo veiculo = new Veiculo("PLACA" + numero, 2020, null, null, CategoriaVeiculo.BASICO);
-        Apolice apolice = new Apolice(veiculo, BigDecimal.valueOf(500), BigDecimal.valueOf(1000), BigDecimal.valueOf(50000));
-        apolice.setNumero(numero);
-        return apolice;
+    static {
+        String sep = File.separator;
+        File dir = new File("." + sep + Apolice.class.getSimpleName());
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
     }
+
+    private Veiculo veiculo = new Veiculo("JQK3B92",2005,null,null,null);
+
+
 
     @Test
     public void teste01() {
-        String numero = "00000001";
-        Apolice ap = criarApoliceComNumero(numero);
-        dao.incluir(ap);
-        Apolice buscada = dao.buscar(numero);
-        Assertions.assertNotNull(buscada);
+
+        String numero = "0";
+
+        cadastro.incluir(new Apolice(veiculo,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO),numero);
+        Apolice seg = dao.buscar(numero);
+        Assertions.assertNotNull(seg);
+
     }
 
     @Test
     public void teste02() {
-        String numero = "00000002";
-        dao.incluir(criarApoliceComNumero(numero));
-        Apolice ap = dao.buscar("99999999");
-        Assertions.assertNull(ap);
+
+        String numero = "0";
+
+        boolean ret = dao.alterar(new Apolice(veiculo, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
+        Assertions.assertFalse(ret);
+
+
     }
 
     @Test
-    public void teste03() {
-        String numero = "00000003";
-        dao.incluir(criarApoliceComNumero(numero));
+    public void teste03(){
+
+        String numero = "0";
+
+        cadastro.incluir(new Apolice(veiculo,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO),numero);
+        Apolice seg = dao.buscar(numero);
         boolean ret = dao.excluir(numero);
         Assertions.assertTrue(ret);
+
+
+
+
+
     }
 
     @Test
     public void teste04() {
-        String numero = "00000004";
-        dao.incluir(criarApoliceComNumero(numero));
-        boolean ret = dao.excluir("00009999");
+        String numero = "0";
+
+        cadastro.incluir(
+                new Apolice(veiculo, new BigDecimal("330.00"), new BigDecimal("500.00"), new BigDecimal("5000.00")),
+                numero);
+
+        boolean ret = dao.excluir("10");
         Assertions.assertFalse(ret);
     }
 
     @Test
     public void teste05() {
-        String numero = "00000005";
-        Apolice ap = criarApoliceComNumero(numero);
-        boolean ret = dao.incluir(ap);
+        String numero = "0";
+
+        Apolice apolice = new Apolice(veiculo, new BigDecimal("320.00"), new BigDecimal("400.00"), new BigDecimal("523320.00"));
+        apolice.setNumero(numero);
+        boolean ret = dao.incluir(apolice);
+
         Assertions.assertTrue(ret);
-        Apolice buscada = dao.buscar(numero);
-        Assertions.assertNotNull(buscada);
+        Apolice apo = dao.buscar(numero);
+        Assertions.assertNotNull(apo);
     }
 
     @Test
     public void teste06() {
-        String numero = "00000006";
-        Apolice ap = criarApoliceComNumero(numero);
-        dao.incluir(ap);
-        boolean ret = dao.incluir(ap);
+        String numero = "0";
+        Apolice apo = new Apolice(veiculo, new BigDecimal("10000.00"), new BigDecimal("4000.00"),
+                new BigDecimal("60000.00"));
+        apo.setNumero(numero);
+        cadastro.incluir(apo, numero);
+        boolean ret = dao.incluir(apo);
         Assertions.assertFalse(ret);
     }
 
     @Test
     public void teste07() {
-        String numero = "00000007";
-        Apolice ap = criarApoliceComNumero(numero);
-        boolean ret = dao.alterar(ap);
+        String numero = "0";
+        boolean ret = dao
+                .alterar(new Apolice(veiculo, new BigDecimal("4000.00"), new BigDecimal("900.00"),
+                        new BigDecimal("50000.00")));
         Assertions.assertFalse(ret);
-        Apolice buscada = dao.buscar(numero);
-        Assertions.assertNull(buscada);
+        Apolice apo = dao.buscar(numero);
+        Assertions.assertNull(apo);
     }
 
     @Test
     public void teste08() {
-        String numero = "00000008";
-        Apolice ap = criarApoliceComNumero(numero);
-        dao.incluir(ap);
-        Apolice alterada = criarApoliceComNumero(numero); 
-        alterada.setValorPremio(BigDecimal.valueOf(2000));
-        boolean ret = dao.alterar(alterada);
+        String numero = "0";
+        Apolice apo = new Apolice(veiculo, new BigDecimal("10000.00"), new BigDecimal("1000.00"),
+                new BigDecimal("100000.00"));
+        apo.setNumero(numero);
+
+        cadastro.incluir(apo, numero);
+
+        apo = new Apolice(veiculo, new BigDecimal("7000.00"), new BigDecimal("1000.00"),
+                new BigDecimal("70000.00"));
+        apo.setNumero(numero);
+
+        boolean ret = dao.alterar(apo);
         Assertions.assertTrue(ret);
     }
-}
+
+
+
+
+
+
+
+
+
+
+    }

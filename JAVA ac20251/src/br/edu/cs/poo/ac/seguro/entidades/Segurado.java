@@ -1,10 +1,13 @@
 package br.edu.cs.poo.ac.seguro.entidades;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Segurado {
-    private String nome;
+public class Segurado implements Serializable {
+   
+	private static final long serialVersionUID = 1L;
+	private String nome;
     private Endereco endereco;
     private LocalDate dataCriacao;
     private BigDecimal bonus;
@@ -39,9 +42,13 @@ public class Segurado {
         return LocalDate.now().getYear() - dataCriacao.getYear();
     }
     public void creditarBonus(BigDecimal valor){
-        bonus = bonus.add(valor);
+    	if (valor.compareTo(BigDecimal.ZERO) > 0) {
+            bonus = bonus.add(valor);
+        }
     }
     public void debitarBonus(BigDecimal valor){
-        bonus = bonus.subtract(valor);
+    	 if (bonus.compareTo(valor) >= 0) {
+             bonus = bonus.subtract(valor);
+         }
     }
 }
