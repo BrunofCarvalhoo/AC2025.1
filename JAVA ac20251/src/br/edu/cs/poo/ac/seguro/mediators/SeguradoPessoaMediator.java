@@ -16,17 +16,20 @@ public class SeguradoPessoaMediator {
 
     public String validarCpf(String cpf) {
         if (StringUtils.ehNuloOuBranco(cpf)) {
-            return "CPF inválido";
+            return "CPF deve ser informado";
+        }
+        if (cpf.length() != 11) {
+            return "CPF deve ter 11 caracteres";
         }
         if (!ValidadorCpfCnpj.ehCpfValido(cpf)) {
-            return "CPF inválido";
+            return "CPF com dígito inválido";
         }
         return null;
     }
 
     public String validarRenda(double renda) {
         if (renda < 0) {
-            return "Renda inválida";
+            return "Renda deve ser maior ou igual à zero";
         }
         return null;
     }
@@ -48,6 +51,10 @@ public class SeguradoPessoaMediator {
         msg = seguradoMediator.validarEndereco(seg.getEndereco());
         if (msg != null) return msg;
 
+        if (seg.getDataNascimento() == null) {
+            return "Data do nascimento deve ser informada";
+        }
+
         return null;
     }
 
@@ -56,7 +63,7 @@ public class SeguradoPessoaMediator {
         if (msg != null) return msg;
 
         if (dao.buscar(seg.getCpf()) != null) {
-            return "Segurado já existente";
+            return "CPF do segurado pessoa já existente";
         }
 
         boolean ok = dao.incluir(seg);
@@ -71,7 +78,7 @@ public class SeguradoPessoaMediator {
         if (msg != null) return msg;
 
         if (dao.buscar(seg.getCpf()) == null) {
-            return "Segurado inexistente";
+            return "CPF do segurado pessoa não existente";
         }
 
         boolean ok = dao.alterar(seg);
@@ -83,12 +90,16 @@ public class SeguradoPessoaMediator {
 
     public String excluirSeguradoPessoa(String cpf) {
         if (StringUtils.ehNuloOuBranco(cpf)) {
-            return "CPF inválido";
+            return "CPF deve ser informado";
+        }
+
+        if (dao.buscar(cpf) == null) {
+            return "CPF do segurado pessoa não existente";
         }
 
         boolean ok = dao.excluir(cpf);
         if (!ok) {
-            return "Segurado inexistente";
+            return "Erro na exclusão";
         }
         return null;
     }
