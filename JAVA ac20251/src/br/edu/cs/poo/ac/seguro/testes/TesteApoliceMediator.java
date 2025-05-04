@@ -20,7 +20,7 @@ import br.edu.cs.poo.ac.seguro.entidades.Veiculo;
 import br.edu.cs.poo.ac.seguro.mediators.ApoliceMediator;
 import br.edu.cs.poo.ac.seguro.mediators.DadosVeiculo;
 import br.edu.cs.poo.ac.seguro.mediators.RetornoInclusaoApolice;
-import br.edu.cs.poo.divisao.RetornoDivisao;
+//import br.edu.cs.poo.divisao.RetornoDivisao;
 
 public class TesteApoliceMediator extends TesteMediator {
 	
@@ -43,10 +43,6 @@ public class TesteApoliceMediator extends TesteMediator {
 		FileUtils.limparDiretorio("." + sep + Sinistro.class.getSimpleName());
 	}
 	
-	/*
-	 * Para uso interno! Este teste sempre vai passar, pois testa o construtor da 
-	 * classe RetornoInclusaoApolice.
-	 */
 	@Test
 	public void test000() {
 		try {

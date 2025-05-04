@@ -1,11 +1,9 @@
 package br.edu.cs.poo.ac.seguro.testes;
 
 import br.edu.cs.poo.ac.seguro.daos.SinistroDAO;
-//import br.edu.cs.poo.ac.seguro.entidades.Apolice;
 import br.edu.cs.poo.ac.seguro.entidades.Sinistro;
 import br.edu.cs.poo.ac.seguro.entidades.TipoSinistro;
 import br.edu.cs.poo.ac.seguro.entidades.Veiculo;
-//import lombok.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +16,7 @@ public class TesteSinistroDAO extends TesteDAO {
     private SinistroDAO dao = new SinistroDAO();
 
     @Override
-    protected Class getClasse() {
+    protected Class<?> getClasse() {
         return Sinistro.class;
     }
 
@@ -37,9 +35,9 @@ public class TesteSinistroDAO extends TesteDAO {
 
     @Test
     public void teste01() {
-
         String numero = "0";
-        cadastro.incluir(new Sinistro(veiculo,LocalDateTime.now(),LocalDateTime.now(),"br_101",BigDecimal.ZERO,tipo),numero);
+        Sinistro sinistro = new Sinistro(numero, veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101", BigDecimal.ZERO, tipo);
+        cadastro.incluir(sinistro, numero);
         Sinistro seg = dao.buscar(numero);
         Assertions.assertNotNull(seg);
     }
@@ -47,28 +45,25 @@ public class TesteSinistroDAO extends TesteDAO {
     @Test
     public void teste02() {
         String numero = "0";
-        boolean ret = dao.alterar(new Sinistro(veiculo, LocalDateTime.now(), LocalDateTime.now(),"br_102", BigDecimal.ZERO,tipo));
+        Sinistro sinistro = new Sinistro(numero, veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_102", BigDecimal.ZERO, tipo);
+        boolean ret = dao.alterar(sinistro);
         Assertions.assertFalse(ret);
     }
 
     @Test
-    public void teste03(){
+    public void teste03() {
         String numero = "0";
-        cadastro.incluir(new Sinistro(veiculo,LocalDateTime.now(),LocalDateTime.now(),"br_101",BigDecimal.ZERO,tipo),numero);
-        Sinistro seg = dao.buscar(numero);
+        Sinistro sinistro = new Sinistro(numero, veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101", BigDecimal.ZERO, tipo);
+        cadastro.incluir(sinistro, numero);
         boolean ret = dao.excluir(numero);
         Assertions.assertTrue(ret);
-
     }
 
     @Test
     public void teste04() {
         String numero = "0";
-
-        cadastro.incluir(
-                new Sinistro(veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101",BigDecimal.ZERO,tipo),
-                numero);
-
+        Sinistro sinistro = new Sinistro(numero, veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101", BigDecimal.ZERO, tipo);
+        cadastro.incluir(sinistro, numero);
         boolean ret = dao.excluir("10");
         Assertions.assertFalse(ret);
     }
@@ -76,8 +71,7 @@ public class TesteSinistroDAO extends TesteDAO {
     @Test
     public void teste05() {
         String numero = "0";
-        Sinistro sinistro = new Sinistro(veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101",BigDecimal.ZERO,tipo);
-        sinistro.setNumero(numero);
+        Sinistro sinistro = new Sinistro(numero, veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101", BigDecimal.ZERO, tipo);
         boolean ret = dao.incluir(sinistro);
         Assertions.assertTrue(ret);
         Sinistro sinistro1 = dao.buscar(numero);
@@ -87,8 +81,7 @@ public class TesteSinistroDAO extends TesteDAO {
     @Test
     public void teste06() {
         String numero = "0";
-        Sinistro sinistro = new Sinistro(veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101",BigDecimal.ZERO,tipo);
-        sinistro.setNumero(numero);
+        Sinistro sinistro = new Sinistro(numero, veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101", BigDecimal.ZERO, tipo);
         cadastro.incluir(sinistro, numero);
         boolean ret = dao.incluir(sinistro);
         Assertions.assertFalse(ret);
@@ -97,24 +90,21 @@ public class TesteSinistroDAO extends TesteDAO {
     @Test
     public void teste07() {
         String numero = "0";
-        boolean ret = dao
-                .alterar(new Sinistro(veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101",BigDecimal.ZERO,tipo));
+        Sinistro sinistro = new Sinistro(numero, veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101", BigDecimal.ZERO, tipo);
+        boolean ret = dao.alterar(sinistro);
         Assertions.assertFalse(ret);
-       Sinistro apo = dao.buscar(numero);
+        Sinistro apo = dao.buscar(numero);
         Assertions.assertNull(apo);
     }
 
     @Test
     public void teste08() {
         String numero = "0";
-        Sinistro apo = new Sinistro(veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101",BigDecimal.ZERO,tipo);
-        apo.setNumero(numero);
+        Sinistro apo = new Sinistro(numero, veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_101", BigDecimal.ZERO, tipo);
         cadastro.incluir(apo, numero);
-        apo = new Sinistro(veiculo, LocalDateTime.now(), LocalDateTime.now(),"br_102", new BigDecimal("10"),tipo
-               );
-        apo.setNumero(numero);
+
+        apo = new Sinistro(numero, veiculo, LocalDateTime.now(), LocalDateTime.now(), "br_102", new BigDecimal("10"), tipo);
         boolean ret = dao.alterar(apo);
         Assertions.assertTrue(ret);
     }
-
 }
