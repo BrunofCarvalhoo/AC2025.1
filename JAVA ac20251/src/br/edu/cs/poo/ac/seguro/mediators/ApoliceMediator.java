@@ -3,6 +3,7 @@ package br.edu.cs.poo.ac.seguro.mediators;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+//import java.time.LocalDateTime;
 import java.util.List;
 
 import br.edu.cs.poo.ac.seguro.daos.ApoliceDAO;
@@ -145,7 +146,7 @@ public class ApoliceMediator {
         BigDecimal vpc = vpb.subtract(bonus.divide(new BigDecimal("10"), 2, RoundingMode.HALF_UP));
         BigDecimal premio = vpc.compareTo(BigDecimal.ZERO) > 0 ? vpc : BigDecimal.ZERO;
         BigDecimal franquia = vpb.multiply(new BigDecimal("1.3")).setScale(2, RoundingMode.HALF_UP);
-
+        
         Apolice novaApolice = new Apolice(numeroApolice ,novoVeiculo, franquia, premio, dados.getValorMaximoSegurado(), hoje);
         daoApo.incluir(novaApolice);
 
@@ -216,7 +217,10 @@ public class ApoliceMediator {
 
         for (Sinistro sin : sinistros) {
             int anoSinistro = sin.getDataHoraSinistro().getYear();
-            if (anoSinistro == anoApolice && sin.getVeiculo().equals(apolice.getVeiculo())) {
+            if (anoSinistro == anoApolice && 
+                sin.getVeiculo() != null && 
+                apolice.getVeiculo() != null &&
+                sin.getVeiculo().getPlaca().equals(apolice.getVeiculo().getPlaca())) {
                 return "Existe sinistro cadastrado para o veículo em questão e no mesmo ano da apólice";
             }
         }
