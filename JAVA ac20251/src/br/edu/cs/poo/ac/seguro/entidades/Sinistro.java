@@ -13,9 +13,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Sinistro implements Serializable {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	@NonNull private String numero;
     @NonNull private Veiculo veiculo;
@@ -24,4 +21,6 @@ public class Sinistro implements Serializable {
     @NonNull private String usuarioRegistro;
     @NonNull private BigDecimal valorSinistro;
     @NonNull private TipoSinistro tipo;
+    		 private int sequencial;
+    		 private String numeroApolice;
 }

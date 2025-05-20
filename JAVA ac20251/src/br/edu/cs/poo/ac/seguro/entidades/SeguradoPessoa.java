@@ -32,4 +32,8 @@ public class SeguradoPessoa extends Segurado implements Serializable {
     public void setDataNascimento(LocalDate dataAbertura){
         super.setDataCriacao(dataAbertura);
     }
+	@Override
+	public boolean isEmpresa() {
+		return false;
+	}
 }
