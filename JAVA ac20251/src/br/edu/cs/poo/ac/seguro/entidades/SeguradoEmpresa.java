@@ -46,7 +46,10 @@ public class SeguradoEmpresa extends Segurado implements Serializable {
 	public boolean isEmpresa() {
 		return true;
 	}
-    
+	@Override
+	public String getIdUnico() {
+	    return cnpj;
+	}
 
 
 }

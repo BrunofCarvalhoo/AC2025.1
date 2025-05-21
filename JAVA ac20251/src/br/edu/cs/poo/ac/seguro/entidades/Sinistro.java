@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 //@AllArgsConstructor
 @RequiredArgsConstructor
-public class Sinistro implements Serializable {
+public class Sinistro implements Serializable, Registro {
 
 	private static final long serialVersionUID = 1L;
 	@NonNull private String numero;
@@ -23,4 +23,10 @@ public class Sinistro implements Serializable {
     @NonNull private TipoSinistro tipo;
     		 private int sequencial;
     		 private String numeroApolice;
+    		 
+    		 @Override
+    		    public String getIdUnico() {
+    		        return numero;
+    		    }		 
+    		 
 }

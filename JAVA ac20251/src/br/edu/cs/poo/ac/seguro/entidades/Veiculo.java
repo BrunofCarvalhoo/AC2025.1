@@ -9,12 +9,16 @@ import lombok.EqualsAndHashCode;
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Veiculo implements Serializable{
+public class Veiculo implements Serializable, Registro{
 
 	private static final long serialVersionUID = 1L;
 	private String placa;
 	private int ano;
 	private CategoriaVeiculo categoria;
 	private Segurado proprietario;
+	@Override
+    public String getIdUnico() {
+        return placa;
+    }
 	
 }
