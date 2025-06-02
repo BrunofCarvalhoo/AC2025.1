@@ -1,9 +1,8 @@
 package br.edu.cs.poo.ac.seguro.daos;
 
-import java.io.Serializable;
-
 import br.edu.cesarschool.next.oo.persistenciaobjetos.CadastroObjetos;
-import br.edu.cs.poo.ac.seguro.entidades.Registro;
+import br.edu.cs.poo.ac.seguro.entidades.Registro; 
+import java.io.Serializable; 
 
 public abstract class DAOGenerico<T extends Registro> {
 
@@ -13,31 +12,20 @@ public abstract class DAOGenerico<T extends Registro> {
         this.cadastro = new CadastroObjetos(getClasseEntidade());
     }
 
-    protected abstract Class<T> getClasseEntidade();
+    public abstract Class<?> getClasseEntidade();
 
-    public boolean incluir(T obj) {
-        if (obj == null || obj.getIdUnico() == null) {
+    public boolean incluir(T registro) {
+        if (registro == null || registro.getIdUnico() == null) {
             return false;
         }
-        if (buscar(obj.getIdUnico()) != null) {
+        if (buscar(registro.getIdUnico()) != null) {
             return false; 
         }
-        cadastro.incluir((Serializable) obj, obj.getIdUnico());
+        cadastro.incluir(registro, registro.getIdUnico());
         return true;
     }
 
-    public boolean alterar(T obj) {
-        if (obj == null || obj.getIdUnico() == null) {
-            return false;
-        }
-        if (buscar(obj.getIdUnico()) == null) {
-            return false; 
-        }
-        cadastro.alterar((Serializable) obj, obj.getIdUnico());
-        return true;
-    }
-
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked") 
     public T buscar(String id) {
         if (id == null) {
             return null;
@@ -45,15 +33,31 @@ public abstract class DAOGenerico<T extends Registro> {
         return (T) cadastro.buscar(id);
     }
 
+    public boolean alterar(T registro) {
+        if (registro == null || registro.getIdUnico() == null) {
+            return false;
+        }
+        if (buscar(registro.getIdUnico()) == null) {
+            return false; 
+        }
+        cadastro.alterar(registro, registro.getIdUnico());
+        return true;
+    }
+
     public boolean excluir(String id) {
         if (id == null || buscar(id) == null) {
-            return false; 
+            return false;
         }
         cadastro.excluir(id);
         return true;
     }
 
     public Registro[] buscarTodos() {
-        return (Registro[]) cadastro.buscarTodos();
+        Serializable[] objsSer = cadastro.buscarTodos();
+        Registro[] registros = new Registro[objsSer.length];
+        for (int i = 0; i < objsSer.length; i++) {
+            registros[i] = (Registro) objsSer[i];
+        }
+        return registros;
     }
 }
