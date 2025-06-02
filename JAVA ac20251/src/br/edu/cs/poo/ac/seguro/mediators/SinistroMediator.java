@@ -1,27 +1,26 @@
 package br.edu.cs.poo.ac.seguro.mediators;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import br.edu.cs.poo.ac.seguro.daos.ApoliceDAO;
 import br.edu.cs.poo.ac.seguro.daos.SinistroDAO;
 import br.edu.cs.poo.ac.seguro.daos.VeiculoDAO;
 import br.edu.cs.poo.ac.seguro.entidades.Apolice;
+import br.edu.cs.poo.ac.seguro.entidades.Registro;
 import br.edu.cs.poo.ac.seguro.entidades.Sinistro;
 import br.edu.cs.poo.ac.seguro.entidades.TipoSinistro;
 import br.edu.cs.poo.ac.seguro.entidades.Veiculo;
 import br.edu.cs.poo.ac.seguro.excecoes.ExcecaoValidacaoDados;
 
-import java.math.BigDecimal;
-
 public class SinistroMediator {
 
-    private VeiculoDAO daoVeiculo = new VeiculoDAO();
-    private ApoliceDAO daoApolice = new ApoliceDAO();
-    private SinistroDAO daoSinistro = new SinistroDAO();
+    private VeiculoDAO daoVeiculo = new VeiculoDAO(); 
+    private ApoliceDAO daoApolice = new ApoliceDAO(); 
+    private SinistroDAO daoSinistro = new SinistroDAO(); 
 
     private static SinistroMediator instancia;
 
@@ -34,108 +33,122 @@ public class SinistroMediator {
     private SinistroMediator() {}
 
     public String incluirSinistro(DadosSinistro dados, LocalDateTime dataHoraAtual) throws ExcecaoValidacaoDados {
-        ExcecaoValidacaoDados excecao = new ExcecaoValidacaoDados();
+        ExcecaoValidacaoDados excecao = new ExcecaoValidacaoDados(); 
+        Veiculo veiculo = null;
 
         if (dados == null) {
-            excecao.getMensagens().add("Dados do sinistro não podem ser nulos.");
-        } else {
-            if (dados.getDataHoraSinistro() == null) {
-                excecao.getMensagens().add("Data/hora do sinistro não pode ser nula.");
-            } else if (!dados.getDataHoraSinistro().isBefore(dataHoraAtual)) {
-                excecao.getMensagens().add("Data/hora do sinistro deve ser anterior à data/hora atual.");
-            }
-
-            if (dados.getPlaca() == null || dados.getPlaca().isBlank()) {
-                excecao.getMensagens().add("Placa não pode ser nula ou vazia.");
-            }
-
-            Veiculo veiculo = null;
-            if (dados.getPlaca() != null && !dados.getPlaca().isBlank()) {
-                veiculo = daoVeiculo.buscar(dados.getPlaca());
-                if (veiculo == null) {
-                    excecao.getMensagens().add("Veículo com a placa informada não está cadastrado.");
-                }
-            }
-
-            if (dados.getUsuarioRegistro() == null || dados.getUsuarioRegistro().isBlank()) {
-                excecao.getMensagens().add("Usuário de registro não pode ser nulo ou vazio.");
-            }
-
-            if (dados.getValorSinistro() <= 0) {
-                excecao.getMensagens().add("Valor do sinistro deve ser maior que zero.");
-            }
-
-            TipoSinistro[] tipos = TipoSinistro.values();
-            if (dados.getCodigoTipoSinistro() < 0 || dados.getCodigoTipoSinistro() >= tipos.length) {
-                excecao.getMensagens().add("Código do tipo de sinistro inválido.");
-            }
-        }
-
-        // Se houver erros, lança exceção
-        if (!excecao.getMensagens().isEmpty()) {
+            excecao.adicionarMensagem("Dados do sinistro devem ser informados"); 
             throw excecao;
         }
 
-        // Buscar apólice vigente para o veículo
-        List<Apolice> apolices = daoApolice.buscarTodos();
+        
+        if (dados.getDataHoraSinistro() == null) { 
+            excecao.adicionarMensagem("Data/hora do sinistro deve ser informada"); 
+        } else if (!dados.getDataHoraSinistro().isBefore(dataHoraAtual)) { 
+            excecao.adicionarMensagem("Data/hora do sinistro deve ser menor que a data/hora atual"); 
+        }
+
+        if (StringUtils.ehNuloOuBranco(dados.getPlaca())) { 
+            excecao.adicionarMensagem("Placa do Veículo deve ser informada"); 
+        } else {
+            veiculo = daoVeiculo.buscar(dados.getPlaca()); 
+            
+            if (veiculo == null) {
+                excecao.adicionarMensagem("Veículo não cadastrado"); 
+            }
+        }
+
+
+        if (StringUtils.ehNuloOuBranco(dados.getUsuarioRegistro())) { 
+            excecao.adicionarMensagem("Usuário do registro de sinistro deve ser informado"); 
+        }
+
+        if (dados.getValorSinistro() <= 0) { 
+            excecao.adicionarMensagem("Valor do sinistro deve ser maior que zero"); 
+        }
+
+        TipoSinistro tipoSinistroSelecionado = TipoSinistro.getTipoSinistro(dados.getCodigoTipoSinistro()); 
+        
+        if (tipoSinistroSelecionado == null) {
+            excecao.adicionarMensagem("Código do tipo de sinistro inválido"); 
+        }
+
+        if (excecao.temErros()) {
+            throw excecao;
+        }
+
+        Registro[] todasAsApolicesRegistros = daoApolice.buscarTodos(); 
+        List<Apolice> todasAsApolices = new ArrayList<>();
+        for(Registro reg : todasAsApolicesRegistros){
+            if(reg instanceof Apolice){
+                todasAsApolices.add((Apolice) reg);
+            }
+        }
+
         Apolice apoliceCobrindo = null;
-        for (Apolice apolice : apolices) {
-            LocalDateTime fimVigencia = apolice.getInicioVigencia().plusYears(1);
-            if (apolice.getVeiculo().getPlaca().equals(dados.getPlaca()) &&
-                !dados.getDataHoraSinistro().isBefore(apolice.getInicioVigencia()) &&
-                dados.getDataHoraSinistro().isBefore(fimVigencia)) {
-                apoliceCobrindo = apolice;
-                break;
+        for (Apolice apolice : todasAsApolices) { 
+            if (apolice.getVeiculo() != null && apolice.getVeiculo().getPlaca().equals(dados.getPlaca())) { 
+                LocalDateTime inicioVigenciaPolicy = apolice.getDataInicioVigencia().atStartOfDay(); 
+                LocalDateTime fimVigenciaPolicy = apolice.getDataInicioVigencia().plusYears(1).atStartOfDay(); 
+
+                if (!dados.getDataHoraSinistro().isBefore(inicioVigenciaPolicy) && 
+                    dados.getDataHoraSinistro().isBefore(fimVigenciaPolicy)) { 
+                    apoliceCobrindo = apolice;
+                    break;
+                }
             }
         }
 
         if (apoliceCobrindo == null) {
-            excecao.getMensagens().add("Não há apólice vigente para o veículo na data do sinistro.");
+            excecao.adicionarMensagem("Não existe apólice vigente para o veículo"); 
+            throw excecao;
+        }
+        
+        
+        BigDecimal valorSinistroBd = BigDecimal.valueOf(dados.getValorSinistro()); 
+        BigDecimal valorMaximoSeguradoBd = apoliceCobrindo.getValorMaximoSegurado(); 
+
+        if (valorSinistroBd.compareTo(valorMaximoSeguradoBd) > 0) {
+            excecao.adicionarMensagem("Valor do sinistro não pode ultrapassar o valor máximo segurado constante na apólice"); // As per TesteSinistroMediator.teste08
             throw excecao;
         }
 
-        if (BigDecimal.valueOf(dados.getValorSinistro()).compareTo(apoliceCobrindo.getValorMaximoCobertura()) > 0) {
-            excecao.getMensagens().add("Valor do sinistro maior que o valor máximo segurado da apólice.");
-            throw excecao;
-        }
+        List<Sinistro> sinistrosExistentes = daoSinistro.buscarTodosLista(); 
+        List<Sinistro> sinistrosMesmoNumeroApolice = new ArrayList<>();
 
-        // Gerar sequencial
-        List<Sinistro> sinistros = daoSinistro.buscarTodos();
-        List<Sinistro> sinistrosMesmoNumero = new ArrayList<>();
-
-        for (Sinistro s : sinistros) {
-            if (apoliceCobrindo.getNumero().equals(s.getNumeroApolice())) {
-                sinistrosMesmoNumero.add(s);
+        for (Sinistro s : sinistrosExistentes) { 
+            if (apoliceCobrindo.getNumero().equals(s.getNumeroApolice())) { 
+                sinistrosMesmoNumeroApolice.add(s);
             }
         }
 
         int novoSequencial = 1;
-        if (!sinistrosMesmoNumero.isEmpty()) {
-            Collections.sort(sinistrosMesmoNumero, new ComparadorSinistroSequencial());
-            novoSequencial = sinistrosMesmoNumero.get(sinistrosMesmoNumero.size() - 1).getSequencial() + 1;
+        if (!sinistrosMesmoNumeroApolice.isEmpty()) {
+            Collections.sort(sinistrosMesmoNumeroApolice, new ComparadorSinistroSequencial()); 
+            novoSequencial = sinistrosMesmoNumeroApolice.get(sinistrosMesmoNumeroApolice.size() - 1).getSequencial() + 1; 
         }
 
-        String numeroSinistro = "S" + apoliceCobrindo.getNumero() + String.format("%03d", novoSequencial);
+        String numeroSinistro = "S" + apoliceCobrindo.getNumero() + String.format("%03d", novoSequencial); 
 
-        Sinistro sinistro = new Sinistro(
+        Sinistro novoSinistro = new Sinistro(
             numeroSinistro,
-            daoVeiculo.buscar(dados.getPlaca()),
-            dados.getDataHoraSinistro(),
+            veiculo, 
+            dados.getDataHoraSinistro(), 
             dataHoraAtual,
-            dados.getUsuarioRegistro(),
-            BigDecimal.valueOf(dados.getValorSinistro()),
-            TipoSinistro.values()[dados.getCodigoTipoSinistro()]
+            dados.getUsuarioRegistro(), 
+            valorSinistroBd, 
+            tipoSinistroSelecionado
         );
 
-        sinistro.setNumeroApolice(apoliceCobrindo.getNumero());
-        sinistro.setSequencial(novoSequencial);
+        novoSinistro.setNumeroApolice(apoliceCobrindo.getNumero()); 
+        novoSinistro.setSequencial(novoSequencial); 
 
-        boolean sucesso = daoSinistro.incluir(sinistro);
-        if (!sucesso) {
-            excecao.getMensagens().add("Erro ao incluir o sinistro no DAO.");
+        boolean inclusaoBemSucedida = daoSinistro.incluir(novoSinistro); 
+        if (!inclusaoBemSucedida) {
+            excecao.adicionarMensagem("Erro ao incluir o sinistro no DAO."); 
             throw excecao;
         }
 
-        return sinistro.getNumero();
+        return novoSinistro.getNumero(); 
     }
 }
