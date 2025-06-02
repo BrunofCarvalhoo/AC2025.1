@@ -96,7 +96,7 @@ public class TesteSinistroMediator extends TesteMediator {
 			Assertions.assertNotNull(msgs);
 			Assertions.assertEquals(2, msgs.size());
 			Assertions.assertEquals("Data/hora do sinistro deve ser menor que a data/hora atual", msgs.get(0));			
-			Assertions.assertEquals("Veículo n�o cadastrado", msgs.get(1));
+			Assertions.assertEquals("Veículo não cadastrado", msgs.get(1));
 		}
 	}
 	

@@ -41,7 +41,6 @@ public class SinistroMediator {
             throw excecao;
         }
 
-        
         if (dados.getDataHoraSinistro() == null) { 
             excecao.adicionarMensagem("Data/hora do sinistro deve ser informada"); 
         } else if (!dados.getDataHoraSinistro().isBefore(dataHoraAtual)) { 
@@ -52,12 +51,10 @@ public class SinistroMediator {
             excecao.adicionarMensagem("Placa do Veículo deve ser informada"); 
         } else {
             veiculo = daoVeiculo.buscar(dados.getPlaca()); 
-            
             if (veiculo == null) {
                 excecao.adicionarMensagem("Veículo não cadastrado"); 
             }
         }
-
 
         if (StringUtils.ehNuloOuBranco(dados.getUsuarioRegistro())) { 
             excecao.adicionarMensagem("Usuário do registro de sinistro deve ser informado"); 
@@ -68,7 +65,6 @@ public class SinistroMediator {
         }
 
         TipoSinistro tipoSinistroSelecionado = TipoSinistro.getTipoSinistro(dados.getCodigoTipoSinistro()); 
-        
         if (tipoSinistroSelecionado == null) {
             excecao.adicionarMensagem("Código do tipo de sinistro inválido"); 
         }
@@ -104,12 +100,11 @@ public class SinistroMediator {
             throw excecao;
         }
         
-        
-        BigDecimal valorSinistroBd = BigDecimal.valueOf(dados.getValorSinistro()); 
+        BigDecimal valorSinistroBd = new BigDecimal(dados.getValorSinistro()); 
         BigDecimal valorMaximoSeguradoBd = apoliceCobrindo.getValorMaximoSegurado(); 
 
         if (valorSinistroBd.compareTo(valorMaximoSeguradoBd) > 0) {
-            excecao.adicionarMensagem("Valor do sinistro não pode ultrapassar o valor máximo segurado constante na apólice"); // As per TesteSinistroMediator.teste08
+            excecao.adicionarMensagem("Valor do sinistro não pode ultrapassar o valor máximo segurado constante na apólice"); 
             throw excecao;
         }
 
@@ -130,9 +125,9 @@ public class SinistroMediator {
 
         String numeroSinistro = "S" + apoliceCobrindo.getNumero() + String.format("%03d", novoSequencial); 
 
-        Sinistro novoSinistro = new Sinistro(
+        Sinistro novoSinistro = new Sinistro( 
             numeroSinistro,
-            veiculo, 
+            veiculo,
             dados.getDataHoraSinistro(), 
             dataHoraAtual,
             dados.getUsuarioRegistro(), 
@@ -145,6 +140,7 @@ public class SinistroMediator {
 
         boolean inclusaoBemSucedida = daoSinistro.incluir(novoSinistro); 
         if (!inclusaoBemSucedida) {
+            
             excecao.adicionarMensagem("Erro ao incluir o sinistro no DAO."); 
             throw excecao;
         }
